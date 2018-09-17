@@ -1,48 +1,59 @@
 <?php
-//var_dump($_POST);
-$passerr = $password = $email = $emailerr = $phone = $phoneerr = "";
-$comments = $commentserr = $contact_via = $contacterr = "";
+  $name = $nameerr = $email = $emailerr = $phone = $phoneerr = $comments = $commentserr = "";
+  if($_SERVER['REQUEST_METHOD'] == "POST") {
 
-if(isset($_POST['register'])){
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    $phone = $_POST['phone'];
-    $comments = $_POST['comments'];
-    $contact_via = $_POST['contact_via'];
-    $pattern = "/[a-zA-Z]{4,8}/";
+    $valid = true;
+    if(isset($_POST['register'])){
+      $name = $_POST['name'];
+      $email = $_POST['email'];
+      $phone = $_POST['phone'];
+      $comments = $_POST['comments'];
+      $patternPhone = "/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/";
+      $patternName = "/[a-zA-Z]/";
 
-    if(empty($password)){
-        $passerr = "Please enter password";
-    }elseif(!preg_match($pattern, $password)){
-        $passerr = "Please enter password with letter only";
-    }else {
-        $passerr = "";
-    }
-    if($email == ""){
-        $emailerr = "please enter email";
-    } elseif(!filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL)){
+      if(empty($name)){
+        $nameerr = "Please enter Name";
+        $valid=false;
+      } elseif(!preg_match($patternName, $name)){
+        $nameerr = "Please enter name in Alphabets";
+        $valid=false;
+      } else {
+        $nameerr = "";
+      }
+
+      if($email == ""){
+        $emailerr = "Please enter Email";
+        $valid=false;
+      } elseif (!filter_input(INPUT_POST, 'Email', FILTER_VALIDATE_EMAIL)) {
         $emailerr = "Please enter valid email";
-    } else {
-        $emailerr= '';
+        $valid=false;
+      } else {
+        $emailerr = "";
+      }
+
+      if($phone == ""){
+        $phoneerr = "Please enter Phone Number";
+        $valid=false;
+      } elseif(!preg_match($patternPhone, $phone)){
+        $phoneerr = "Example: 416-444-4444";
+        $valid=false;
+      } else {
+        $phoneerr = "";
+      }
+
+      if($comments == ""){
+        $commentserr = "Please enter Comment";
+        $valid=false;
+      } else {
+        $commentserr = "";
+      }
+
+      if($valid){
+        header('location:display_results.php');
+        exit();
+      }
     }
-    if($password == ""){
-        $passerr = "please enter password";
-    } elseif(!filter_input(INPUT_POST, 'password', FILTER_VALIDATE_PASSWORD)){
-        $passerr = "Please enter valid password";
-    } else {
-        $passerr= '';
-    }
-    if($phone == ""){
-        $phoneerr = "please enter phone";
-    } else {
-        $phoneerr= '';
-    }
-    if($comments == ""){
-        $commentserr = "please enter your comment";
-    } else {
-        $phoneerr= '';
-    }
-}
+  }
 ?>
 
 <!DOCTYPE html>
@@ -59,53 +70,29 @@ if(isset($_POST['register'])){
 
   <main>
     <div id="content">
-    <h2>Account Sign Up</h2>
-    <form action="about.php" method="post">
+    <h2>Questions or Concerns</h2>
+    <form action="" method="post">
 
     <fieldset>
-    <legend>Account Information</legend>
-        <label>E-Mail:</label>
-        <input type="text" name="email" value="" class="textbox"/>
-        <span><?php echo $emailerr; ?></span>
-        <br />
+    <legend>Contact Information</legend>
+        <label for="name">Name:</label> <br />
+        <input type="text" name="name" value="<?php echo $name; ?>" class="textbox"/>
+        <span class="error"><?php echo $nameerr; ?></span>
+        <br /><br />
 
-        <label>Password:</label>
-        <input type="text" name="password" value="<?php  echo $password; ?>" class="textbox"/>
-        <span><?php echo $passerr; ?></span>
-        <br />
-        <label>Phone Number:</label>
-        <input type="text" name="phone" value="" class="textbox"/>
-        <span><?php echo $phoneerr; ?></span>
-        <br />
-    </fieldset>
+        <label for="email">Email:</label> <br />
+        <input type="text" name="email" value="<?php echo $email; ?>" class="textbox"/>
+        <span class="error"><?php echo $emailerr; ?></span>
+        <br /><br />
 
-    <fieldset>
-    <legend>Settings</legend>
+        <label for="phone">Phone Number:</label> <br />
+        <input type="text" name="phone" value="<?php echo $phone; ?>" class="textbox"/>
+        <span class="error"><?php echo $phoneerr; ?></span>
+        <br /><br />
 
-        <p>How did you hear about us?</p>
-        <input type="radio" name="heard_from" value="Search Engine" />
-        Search engine<br />
-        <input type="radio" name="heard_from" value="Friend" />
-        Word of mouth<br />
-        <input type=radio name="heard_from" value="Other" />
-        Other<br />
-
-        <p>Would you like to receive announcements about new products
-           and special offers?</p>
-        <input type="checkbox" name="wants_updates"/>YES, I'd like to receive
-        information about new products and special offers.<br />
-
-        <p>Contact via:</p>
-        <select name="contact_via">
-                <option value="email">Email</option>
-                <option value="text">Text Message</option>
-                <option value="phone">Phone</option>
-        </select>
-
-        <p>Comments:</p>
-        <textarea name="comments" rows="4" cols="50"></textarea>
-        <span><?php echo $commentserr; ?></span>
-        <br />
+        <label for="comments">Comments:</label> <br />
+        <textarea name="comments" rows="4" cols="50" value="<?php echo $comments; ?>"></textarea>
+        <span class="error"><?php echo $commentserr; ?></span>
     </fieldset>
 
     <input type="submit" value="Submit" name="register"/>
